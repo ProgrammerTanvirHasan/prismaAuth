@@ -8,3 +8,4 @@ const router=express.Router();
 router.post("/",postController.createPost)
 
 export  const postRouter=router;
+

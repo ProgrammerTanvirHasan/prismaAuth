@@ -13,52 +13,115 @@ datasource db {
   provider = "postgresql"
 }
 
-model Post{
-  id String @id @default(uuid())
-  title String @db.VarChar(225)
-  content String @db.Text
-  thumbnail String?
-  isFeatured Boolean @default(false)
-  status PostStatus @default(PUBLISHED)
-  tags String []
-  views Int? @default(0)
-  authorId String // betterAuth theke menage hobe ..mane user ba author create amra schema diye korbona eta betterAuth jekhane authentication er bepar ta ghotbe shekhan theke ashbe
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  comments Comments[]
-  @@index([authorId]) 
+model Post {
+  id         String     @id @default(uuid())
+  title      String     @db.VarChar(225)
+  content    String     @db.Text
+  thumbnail  String?
+  isFeatured Boolean    @default(false)
+  status     PostStatus @default(PUBLISHED)
+  tags       String[]
+  views      Int?       @default(0)
+  authorId   String // betterAuth theke menage hobe ..mane user ba author create amra schema diye korbona eta betterAuth jekhane authentication er bepar ta ghotbe shekhan theke ashbe
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  comments   Comments[]
   // authorid er upor index set kora holo jeno shohojei authorid dhore tarpost gula get korte pari
-  @@map("posts")
   // model er name ta database er jonno change kora holo..ekhon database a posts nam diye save hobe
+  @@index([authorId])
+  @@map("posts")
 }
 
-model Comments{
-    id String @id @default(uuid())
-  content String @db.Text
+model Comments {
+  id       String     @id @default(uuid())
+  content  String     @db.Text
   authorId String //betterAuth
-  postId String
-  post Post @relation(fields: [postId] ,references: [id])
-  parentId String? 
-  parrent Comments? @relation("commentReplies",fields: [parentId],references: [id])
-  replies Comments[] @relation("commentReplies")
+  postId   String
+  post     Post       @relation(fields: [postId], references: [id])
+  parentId String?
+  parrent  Comments?  @relation("commentReplies", fields: [parentId], references: [id])
+  replies  Comments[] @relation("commentReplies")
   // Comments table er id er shathe shei table er e parrentId er relation.self_relation.eder moddhe misunderStanding komate alada ekta name add kora hoyece ("commentReplies")
 
-  status CommentsStatus @default(APPROVED)
-     createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  status    CommentsStatus @default(APPROVED)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
 
   @@index([postId])
   @@index([authorId])
   @@map("comments")
 }
-enum PostStatus{
+
+enum PostStatus {
   DRAFT
   PUBLISHED
   ARCHIVED
 }
 
-enum CommentsStatus{
+enum CommentsStatus {
   APPROVED
   REJECT
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
 }
