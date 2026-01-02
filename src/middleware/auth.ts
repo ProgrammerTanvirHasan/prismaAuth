@@ -25,8 +25,9 @@ const middleware = (...roles: userRole[]) => {
     //user verify er jonno user er session dorkar r shei session create hoyece prisma schema te jokhon amra betterauth er maddhome signup create kori..
     try {
       const session = await auth.api.getSession({
-        headers: req.headers as any,
+        headers: req.headers as any, //request ashle je cookie ta create hoi take decode kore all information session a set kore
       });
+
       if (!session) {
         return res.status(401).json({ message: "Unauthorized" });
       }
