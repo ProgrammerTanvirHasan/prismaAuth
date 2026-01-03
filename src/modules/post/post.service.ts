@@ -27,12 +27,20 @@ const getTitle = async ({
   isFeatured,
   status,
   authorId,
+  page,
+  limit,
+  shortBy, //{asc or dsc}
+  shortOrder, //{title or other field}
 }: {
   search: string | undefined;
   tags: string[] | [];
   isFeatured: boolean | undefined;
   status: PostStatus | undefined;
   authorId: string | undefined;
+  page: number;
+  limit: number;
+  shortBy: string | undefined;
+  shortOrder: string | undefined;
 }) => {
   const allValue: PostWhereInput[] = []; //allValue variable a shudhu true value gula add hobe karon and condition kokhono false value er shathe hoina tay jodi search er value thake and tags er value thake tobei kbl allValue te add hobe ekhon and condition chalano easy
   if (search) {
@@ -81,12 +89,20 @@ const getTitle = async ({
   if (authorId) {
     allValue.push({ authorId });
   }
-
+  const skip = (page - 1) * limit;
   const result = await prisma.post.findMany({
+    take: limit,
+    skip,
     where: {
       AND: allValue, //allValue te 2 ta condition er value ace..
       // and na dile 2ta condition true holei kbl value dito but and dewate 2 tar jkuno ekta perameter dilei shei onujay value return korbe
     },
+    orderBy:
+      shortBy && shortOrder
+        ? {
+            [shortOrder]: shortBy,
+          }
+        : { createdAt: "desc" },
   });
 
   return result;
