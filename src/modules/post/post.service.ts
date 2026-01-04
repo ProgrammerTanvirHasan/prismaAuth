@@ -19,6 +19,28 @@ const getUsers = async () => {
   const result = await prisma.post.findMany();
   return result;
 };
+
+const getPostById = async (postId: string) => {
+  const result = await prisma.$transaction(async (tx) => {
+    await tx.post.update({
+      where: {
+        id: postId,
+      },
+      data: {
+        views: {
+          increment: 1,
+        },
+      },
+    }); //transaction use korar ortho hocce eikhane update and find 2 tay thik thakle kbl output debe.jodi kuno ekta error hoi tobe baki ektar output return korbena
+    const uniqeId = await tx.post.findUnique({
+      where: {
+        id: postId,
+      },
+    });
+    return uniqeId;
+  });
+  return result;
+};
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 const getTitle = async ({
@@ -105,13 +127,27 @@ const getTitle = async ({
         : { createdAt: "desc" },
   });
 
-  return result;
+  const total = await prisma.post.count({
+    where: {
+      AND: allValue,
+    },
+  });
+
+  return {
+    data: result,
+    totalData: {
+      total,
+      page,
+      limit,
+    },
+  };
 };
 
 export const postService = {
   createPost,
   getUsers,
   getTitle,
+  getPostById,
 };
 
 //mainly ekhon kaj ta hobe jotogula conditon and er moddhe thakbe mane allValue array er moddhe thakbe shob gular moddho theke jkuno true holew sheitar condition onujay value ashbe abar ekadhik perameter o dewa jete pare pare .eivabei kaj cholbe.shob gula perameter ew value ashbe abar jkuno ekta perameter ew value ashbe etay AND er kaj

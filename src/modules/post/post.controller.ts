@@ -24,6 +24,16 @@ const getAllUser = async (req: Request, res: Response) => {
   }
 };
 
+const getPostById = async (req: Request, res: Response) => {
+  try {
+    const { postId } = req.params;
+    const result = await postService.getPostById(postId as string);
+    res.send(result);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
+
 const getByTitle = async (req: Request, res: Response) => {
   try {
     const { search } = req.query;
@@ -67,4 +77,5 @@ export const postController = {
   createPost,
   getAllUser,
   getByTitle,
+  getPostById,
 };
