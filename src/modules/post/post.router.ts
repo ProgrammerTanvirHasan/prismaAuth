@@ -10,3 +10,4 @@ router.get("/:postId", postController.getPostById);
 router.post("/", middleware(userRole.USER), postController.createPost);
 
 export const postRouter = router;
+

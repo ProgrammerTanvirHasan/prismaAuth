@@ -3,6 +3,7 @@ import { postService } from "./post.service";
 import type { PostStatus } from "../../../generated/prisma/enums";
 
 const createPost = async (req: Request, res: Response) => {
+  console.log(req, "req");
   try {
     const user = req.user;
     if (!user) {
