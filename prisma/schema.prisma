@@ -73,8 +73,10 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  status String @default("ACTIVE")
 
   role String? @default("USER")
+
 
   phone String?
 

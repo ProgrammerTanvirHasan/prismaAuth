@@ -13,5 +13,10 @@ router.get(
   postController.getMyPosts
 );
 router.post("/", middleware(userRole.USER), postController.createPost);
+router.patch(
+  "/:postId",
+  middleware(userRole.USER, userRole.ADMIN),
+  postController.updateMyPosts
+);
 
 export const postRouter = router;

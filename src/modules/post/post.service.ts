@@ -180,6 +180,16 @@ const getTitle = async ({
 };
 
 const getMyPost = async (authorId: string) => {
+  await prisma.user.findUniqueOrThrow({
+    where: {
+      id: authorId,
+      status: "ACTIVE", //USER er STATUS  jodi ACTIVE  na hoi tobe eikhan thekei return kore debe
+    },
+    select: {
+      id: true,
+    },
+  });
+
   const myPost = await prisma.post.findMany({
     where: {
       authorId,
@@ -211,12 +221,48 @@ const getMyPost = async (authorId: string) => {
   };
 };
 
+const updateMyPost = async (
+  postId: string,
+  data: Partial<Post>,
+  authorId: string,
+  isAdmin: boolean
+) => {
+  const postData = await prisma.post.findUniqueOrThrow({
+    where: {
+      id: postId,
+    },
+    select: {
+      id: true,
+      authorId: true,
+    },
+  });
+
+  if (!isAdmin && postData.authorId !== authorId) {
+    ///admin jodi na hoi and user verify jodi thik na thake tahole kuno kicui update korte parbena
+    throw new Error("u have not access");
+  }
+
+  if (!isAdmin) {
+    delete data.isFeatured; //admin jodi na hoi mane jodi general user hoi tara isFeatured update hobena..er jonno delete kore debo.only admin user er isFeatuerd update korte parbe
+  }
+
+  const result = await prisma.post.update({
+    where: {
+      id: postData.id,
+    },
+    data,
+  });
+
+  return result;
+};
+
 export const postService = {
   createPost,
   getUsers,
   getTitle,
   getPostById,
   getMyPost,
+  updateMyPost,
 };
 
 //mainly ekhon kaj ta hobe jotogula conditon and er moddhe thakbe mane allValue array er moddhe thakbe shob gular moddho theke jkuno true holew sheitar condition onujay value ashbe abar ekadhik perameter o dewa jete pare pare .eivabei kaj cholbe.shob gula perameter ew value ashbe abar jkuno ekta perameter ew value ashbe etay AND er kaj

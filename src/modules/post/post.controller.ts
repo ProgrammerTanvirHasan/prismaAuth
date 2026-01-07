@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { postService } from "./post.service";
 import type { PostStatus } from "../../../generated/prisma/enums";
+import { userRole } from "../../middleware/auth";
 
 const createPost = async (req: Request, res: Response) => {
   console.log(req, "req");
@@ -80,7 +81,29 @@ const getMyPosts = async (req: Request, res: Response) => {
     if (!user) {
       throw new Error("unAthorized");
     }
+
     const result = await postService.getMyPost(user?.id as string);
+    res.send(result);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
+const updateMyPosts = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      throw new Error("invalid");
+    }
+    const { postId } = req.params;
+
+    const isAdmin = user.role === userRole.ADMIN;
+
+    const result = await postService.updateMyPost(
+      postId as string,
+      req.body,
+      user.id,
+      isAdmin
+    );
     res.send(result);
   } catch (error) {
     res.status(400).send(error);
@@ -93,4 +116,5 @@ export const postController = {
   getByTitle,
   getPostById,
   getMyPosts,
+  updateMyPosts,
 };
