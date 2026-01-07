@@ -179,11 +179,44 @@ const getTitle = async ({
   };
 };
 
+const getMyPost = async (authorId: string) => {
+  const myPost = await prisma.post.findMany({
+    where: {
+      authorId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      _count: {
+        select: {
+          comments: true,
+        },
+      },
+    },
+  });
+
+  const totalPost = await prisma.post.aggregate({
+    //aggregate use kore count bebohar kora
+    _count: {
+      id: true,
+    },
+    where: {
+      authorId,
+    },
+  });
+  return {
+    data: myPost,
+    totalPost,
+  };
+};
+
 export const postService = {
   createPost,
   getUsers,
   getTitle,
   getPostById,
+  getMyPost,
 };
 
 //mainly ekhon kaj ta hobe jotogula conditon and er moddhe thakbe mane allValue array er moddhe thakbe shob gular moddho theke jkuno true holew sheitar condition onujay value ashbe abar ekadhik perameter o dewa jete pare pare .eivabei kaj cholbe.shob gula perameter ew value ashbe abar jkuno ekta perameter ew value ashbe etay AND er kaj
