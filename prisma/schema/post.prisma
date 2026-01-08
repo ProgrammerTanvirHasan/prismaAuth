@@ -1,0 +1,25 @@
+
+model Post {
+  id         String     @id @default(uuid())
+  title      String     @db.VarChar(225)
+  content    String     @db.Text
+  thumbnail  String?
+  isFeatured Boolean    @default(false)
+  status     PostStatus @default(PUBLISHED)
+  tags       String[]
+  views      Int?       @default(0)
+  authorId   String // betterAuth theke menage hobe ..mane user ba author create amra schema diye korbona eta betterAuth jekhane authentication er bepar ta ghotbe shekhan theke ashbe
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  comments   Comments[]
+  // authorid er upor index set kora holo jeno shohojei authorid dhore tarpost gula get korte pari
+  // model er name ta database er jonno change kora holo..ekhon database a posts nam diye save hobe
+  @@index([authorId])
+  @@map("posts")
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}

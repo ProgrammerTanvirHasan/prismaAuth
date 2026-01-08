@@ -110,6 +110,33 @@ const updateMyPosts = async (req: Request, res: Response) => {
   }
 };
 
+const deletePost = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      throw new Error("invalid");
+    }
+    const { postId } = req.params;
+    const isAdmin = user.role === userRole.ADMIN;
+    const result = await postService.deletePost(
+      postId as string,
+      user.id,
+      isAdmin as boolean
+    );
+    res.send(result);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
+const getStatistics = async (req: Request, res: Response) => {
+  try {
+    const result = await postService.getStatistics();
+    res.send(result);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
+
 export const postController = {
   createPost,
   getAllUser,
@@ -117,4 +144,6 @@ export const postController = {
   getPostById,
   getMyPosts,
   updateMyPosts,
+  deletePost,
+  getStatistics,
 };

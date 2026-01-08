@@ -256,6 +256,88 @@ const updateMyPost = async (
   return result;
 };
 
+const deletePost = async (
+  postId: string,
+  authorId: string,
+  isAdmin: boolean
+) => {
+  const postData = await prisma.post.findUniqueOrThrow({
+    where: {
+      id: postId,
+    },
+    select: {
+      id: true,
+      authorId: true,
+    },
+  });
+  if (!isAdmin && postData.authorId !== authorId) {
+    throw new Error("u have not access");
+  }
+  return prisma.post.delete({
+    where: {
+      id: postId,
+    },
+  });
+};
+
+const getStatistics = async () => {
+  //post_count,published_post,draft_post,total_comments,total_views
+
+  return await prisma.$transaction(async (tx) => {
+    const [
+      totoalPost,
+      publishedPost,
+      draftPost,
+      totalComments,
+      approvedComment,
+      userCount,
+      adminUser,
+      totoalViews,
+    ] = await Promise.all([
+      //Promise.all use kore ekta array er moddhe shob gula variable ke shajiye nilam.
+      await tx.post.count(),
+      await tx.post.count({
+        where: {
+          status: PostStatus.PUBLISHED,
+        },
+      }),
+      await tx.post.count({
+        where: {
+          status: PostStatus.DRAFT,
+        },
+      }),
+      await tx.comments.count(),
+      await tx.comments.count({
+        where: {
+          status: CommentsStatus.APPROVED,
+        },
+      }),
+      await tx.user.count(),
+      await tx.user.count({
+        where: {
+          role: "ADMIN",
+        },
+      }),
+      await tx.post.aggregate({
+        _sum: {
+          views: true, //jehetu individual shob post er sum view dekhte chay tay aggregate
+        },
+      }),
+    ]);
+
+    return {
+      totoalPost,
+      publishedPost,
+      draftPost,
+      totalComments,
+      approvedComment,
+      userCount,
+      adminUser,
+      totoalViews: totoalViews._sum.views,
+    };
+  });
+};
+
 export const postService = {
   createPost,
   getUsers,
@@ -263,6 +345,8 @@ export const postService = {
   getPostById,
   getMyPost,
   updateMyPost,
+  deletePost,
+  getStatistics,
 };
 
 //mainly ekhon kaj ta hobe jotogula conditon and er moddhe thakbe mane allValue array er moddhe thakbe shob gular moddho theke jkuno true holew sheitar condition onujay value ashbe abar ekadhik perameter o dewa jete pare pare .eivabei kaj cholbe.shob gula perameter ew value ashbe abar jkuno ekta perameter ew value ashbe etay AND er kaj
