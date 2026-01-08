@@ -4,6 +4,8 @@ import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth";
 import cors from "cors";
 import { commentRouter } from "./modules/comment/comment.router";
+import errorHandler from "./middleware/globalErrorHandler";
+import { notFound } from "./middleware/notFound";
 const app = express();
 app.all("/api/auth/*splat", toNodeHandler(auth)); //splat হলো এমন একটা dynamic parameter যা /api/auth/ এর পরে যা কিছুই আসুক না কেন, সবকিছুকে ধরে ফেলে।must dite hobe
 app.use(
@@ -19,6 +21,8 @@ app.use("/comment", commentRouter);
 app.get("/", (req, res) => {
   res.send("Hello prisma!");
 });
+app.use(notFound);
+app.use(errorHandler);
 
 export default app;
 

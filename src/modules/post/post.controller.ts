@@ -1,9 +1,9 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { postService } from "./post.service";
 import type { PostStatus } from "../../../generated/prisma/enums";
 import { userRole } from "../../middleware/auth";
 
-const createPost = async (req: Request, res: Response) => {
+const createPost = async (req: Request, res: Response, next: NextFunction) => {
   console.log(req, "req");
   try {
     const user = req.user;
@@ -13,30 +13,30 @@ const createPost = async (req: Request, res: Response) => {
     const result = await postService.createPost(req.body, user.id as string);
     res.status(201).send(result);
   } catch (error) {
-    res.status(400).send(error);
+    next(error);
   }
 };
 
-const getAllUser = async (req: Request, res: Response) => {
+const getAllUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await postService.getUsers();
     res.send(result);
   } catch (error) {
-    res.status(400).send(error);
+    next(error);
   }
 };
 
-const getPostById = async (req: Request, res: Response) => {
+const getPostById = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { postId } = req.params;
     const result = await postService.getPostById(postId as string);
     res.send(result);
   } catch (error) {
-    res.status(400).send(error);
+    next(error);
   }
 };
 
-const getByTitle = async (req: Request, res: Response) => {
+const getByTitle = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { search } = req.query;
     const searchString = typeof search === "string" ? search : undefined;
@@ -71,11 +71,11 @@ const getByTitle = async (req: Request, res: Response) => {
     });
     res.send(result);
   } catch (error) {
-    res.status(400).send(error);
+    next(error);
   }
 };
 
-const getMyPosts = async (req: Request, res: Response) => {
+const getMyPosts = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = req.user;
     if (!user) {
@@ -85,10 +85,14 @@ const getMyPosts = async (req: Request, res: Response) => {
     const result = await postService.getMyPost(user?.id as string);
     res.send(result);
   } catch (error) {
-    res.status(400).send(error);
+    next(error);
   }
 };
-const updateMyPosts = async (req: Request, res: Response) => {
+const updateMyPosts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const user = req.user;
     if (!user) {
@@ -106,11 +110,11 @@ const updateMyPosts = async (req: Request, res: Response) => {
     );
     res.send(result);
   } catch (error) {
-    res.status(400).send(error);
+    next(error);
   }
 };
 
-const deletePost = async (req: Request, res: Response) => {
+const deletePost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = req.user;
     if (!user) {
@@ -125,15 +129,19 @@ const deletePost = async (req: Request, res: Response) => {
     );
     res.send(result);
   } catch (error) {
-    res.status(400).send(error);
+    next(error);
   }
 };
-const getStatistics = async (req: Request, res: Response) => {
+const getStatistics = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const result = await postService.getStatistics();
     res.send(result);
   } catch (error) {
-    res.status(400).send(error);
+    next(error);
   }
 };
 
