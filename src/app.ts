@@ -7,13 +7,14 @@ import { commentRouter } from "./modules/comment/comment.router";
 import errorHandler from "./middleware/globalErrorHandler";
 import { notFound } from "./middleware/notFound";
 const app = express();
-app.all("/api/auth/*splat", toNodeHandler(auth)); //splat হলো এমন একটা dynamic parameter যা /api/auth/ এর পরে যা কিছুই আসুক না কেন, সবকিছুকে ধরে ফেলে।must dite hobe
 app.use(
   cors({
-    origin: process.env.APP_URL || "http://localhost:5000",
+    origin: process.env.APP_URL || "http://localhost:3000",
     credentials: true,
-  })
+  }),
 );
+app.all("/api/auth/*splat", toNodeHandler(auth)); //splat হলো এমন একটা dynamic parameter যা /api/auth/ এর পরে যা কিছুই আসুক না কেন, সবকিছুকে ধরে ফেলে।must dite hobe
+
 app.use(express.json()); //app.use(express.json()) মানে হলো — সার্ভারে আসা JSON ডেটাকে পড়ে জাভাস্ক্রিপ্ট অবজেক্টে রূপান্তর করা।console.log(req.body);  // { name: 'Rahim', age: 25 } এমন আসবে.eta use na korle undefined ashto
 
 app.use("/post", postRouter);

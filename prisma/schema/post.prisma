@@ -12,6 +12,10 @@ model Post {
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
   comments   Comments[]
+  published Boolean  @default(false) 
+
+author    User    @relation(fields: [authorId], references: [id])
+
   // authorid er upor index set kora holo jeno shohojei authorid dhore tarpost gula get korte pari
   // model er name ta database er jonno change kora holo..ekhon database a posts nam diye save hobe
   @@index([authorId])

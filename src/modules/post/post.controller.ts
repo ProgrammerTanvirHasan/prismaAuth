@@ -4,7 +4,6 @@ import type { PostStatus } from "../../../generated/prisma/enums";
 import { userRole } from "../../middleware/auth";
 
 const createPost = async (req: Request, res: Response, next: NextFunction) => {
-  console.log(req, "req");
   try {
     const user = req.user;
     if (!user) {

@@ -13,7 +13,7 @@ router.get(
   middleware(userRole.USER, userRole.ADMIN),
   postController.getMyPosts
 );
-router.post("/", middleware(userRole.USER), postController.createPost);
+router.post("/", postController.createPost); // middleware(userRole.USER),
 router.patch(
   "/:postId",
   middleware(userRole.USER, userRole.ADMIN),

@@ -27,7 +27,7 @@ async function seedAdmin() {
           "Content-type": "application/json",
         },
         body: JSON.stringify(adminData),
-      }
+      },
     );
     if (signUpAdmin.ok) {
       const update = await prisma.user.update({
