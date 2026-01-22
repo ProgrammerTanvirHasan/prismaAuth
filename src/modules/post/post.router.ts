@@ -11,18 +11,22 @@ router.get("/:postId", postController.getPostById);
 router.get(
   "/my-post",
   middleware(userRole.USER, userRole.ADMIN),
-  postController.getMyPosts
+  postController.getMyPosts,
 );
-router.post("/", postController.createPost); // middleware(userRole.USER),
+router.post(
+  "/",
+  middleware(userRole.USER, userRole.ADMIN),
+  postController.createPost,
+);
 router.patch(
   "/:postId",
   middleware(userRole.USER, userRole.ADMIN),
-  postController.updateMyPosts
+  postController.updateMyPosts,
 );
 router.delete(
   "/:postId",
   middleware(userRole.USER, userRole.ADMIN),
-  postController.deletePost
+  postController.deletePost,
 );
 
 export const postRouter = router;
